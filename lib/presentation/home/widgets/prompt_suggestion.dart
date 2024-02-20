@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:gemi/resource/assets.dart';
+import 'package:gemi/core/resource/assets.dart';
 
 import 'gradient_text.dart';
 import 'promt_suggestion_chip.dart';

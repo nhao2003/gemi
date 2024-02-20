@@ -52,21 +52,13 @@ class MyApp extends StatelessWidget {
         ),
         initialRoute: '/splash',
         routes: {
-          '/home': (context) => HomeScreen(
+          '/home': (context) => const HomeScreen(
                 title: "Gemini",
               ),
-          '/sign_in': (context) => BlocProvider(
-              create: (context) => sl<SignInBloc>(),
-              child: const SignInScreen()),
-          'sign_up': (context) => BlocProvider(
-              create: (context) => sl<SignUpBloc>(),
-              child: const SignUpScreen()),
-          '/splash': (context) => BlocProvider(
-              create: (context) => sl<SplashBloc>(),
-              child: const SplashScreen()),
-          '/setting': (context) => BlocProvider(
-              create: (context) => sl<SettingBloc>(),
-              child: const SettingScreen()),
+          '/sign_in': (context) => const SignInScreen(),
+          'sign_up': (context) => const SignUpScreen(),
+          '/splash': (context) => const SplashScreen(),
+          '/setting': (context) => const SettingScreen(),
           'forgot_password': (context) => const ForgotPasswordScreen()
         });
   }

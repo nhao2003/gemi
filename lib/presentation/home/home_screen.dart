@@ -5,7 +5,7 @@ import 'package:gemi/domain/entities/prompt.dart';
 import 'package:gemi/presentation/home/widgets/chat_input.dart';
 import 'package:gemi/presentation/home/widgets/gemini_drawer.dart';
 import 'package:gemi/presentation/home/widgets/home_started.dart';
-import 'package:gemi/resource/assets.dart';
+import 'package:gemi/core/resource/assets.dart';
 import 'package:gemi/domain/enums/enums.dart';
 import 'package:image_picker/image_picker.dart';
 import 'bloc/home_bloc.dart';

@@ -7,7 +7,7 @@ import 'package:gemi/domain/entities/conversation.dart';
 import '../../../data/data_source/local/gemini_local_data_source.dart';
 import '../../../data/data_source/local/local_database.dart';
 import '../../../data/data_source/remote/gemini_remote_data_source/gemini_remote_data_source.dart';
-import '../../../resource/assets.dart';
+import '../../../core/resource/assets.dart';
 import '../../setting/setting_screen.dart';
 
 class GeminiDrawer extends StatelessWidget {

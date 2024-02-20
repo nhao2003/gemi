@@ -11,7 +11,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../data/model/gemini/content/content.dart';
 import '../../../domain/entities/prompt.dart';
-import '../../../resource/assets.dart';
+import '../../../core/resource/assets.dart';
 
 // enum buttonType { like, dislike, share, more }
 

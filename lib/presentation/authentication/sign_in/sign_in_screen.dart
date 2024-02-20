@@ -7,7 +7,7 @@ import 'package:gemi/core/utils/string_util.dart';
 import 'package:gemi/dependency_container.dart';
 import 'package:gemi/presentation/authentication/sign_in/bloc/sign_in_bloc.dart';
 import 'package:gemi/presentation/home/widgets/gradient_text.dart';
-import 'package:gemi/resource/assets.dart';
+import 'package:gemi/core/resource/assets.dart';
 
 import '../forgot_password/forgot_password_screen.dart';
 import '../sign_up/sign_up_screen.dart';
