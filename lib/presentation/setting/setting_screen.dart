@@ -39,22 +39,28 @@ class _SettingScreenState extends State<SettingScreen> {
                   showDialog(
                       context: context,
                       builder: (context) {
-                        return BlocBuilder<SettingBloc, SettingState>(
-                          builder: (context, state) {
-                            var safetySettings =
-                                state is SafetyCategorySettingsLoaded
-                                    ? Map<SafetyCategory, int>.from(
-                                        state.safetyCategorySettings)
-                                    : Map<SafetyCategory, int>.from({});
-                            return SafetySettingDialog(
-                              safetySettings: safetySettings,
-                              isLoading: state is SafetyCategorySettingsLoading,
-                              onSave: (safetySettings) {
-                                context.read<SettingBloc>().add(
-                                    SetSafetyCategorySettings(safetySettings));
-                              },
-                            );
-                          },
+                        return BlocProvider.value(
+                          value: sl<SettingBloc>(),
+                          child: BlocBuilder<SettingBloc, SettingState>(
+                            bloc: sl<SettingBloc>(),
+                            builder: (context, state) {
+                              var safetySettings =
+                                  state is SafetyCategorySettingsLoaded
+                                      ? Map<SafetyCategory, int>.from(
+                                          state.safetyCategorySettings)
+                                      : Map<SafetyCategory, int>.from({});
+                              return SafetySettingDialog(
+                                safetySettings: safetySettings,
+                                isLoading:
+                                    state is SafetyCategorySettingsLoading,
+                                onSave: (safetySettings) {
+                                  context.read<SettingBloc>().add(
+                                      SetSafetyCategorySettings(
+                                          safetySettings));
+                                },
+                              );
+                            },
+                          ),
                         );
                       });
                 },

@@ -66,9 +66,10 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         conversations: state.conversations,
       );
       emit(newState);
-      final result = _geminiRepository.streamGenerateChat(
-        event.text ?? "",
-        chats: prompts,
+      final result = _geminiRepository.streamGeneratedPrompt(
+        text: event.text,
+        conversationId: conversationId,
+        images: event.images,
       );
       await for (var value in result) {
         value.fold((l) {

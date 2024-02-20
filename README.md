@@ -1,16 +1,55 @@
-# gemi
+# Gemi
 
-A new Flutter project.
+- **Introduce the application:**
+
+  - Gemi is a Flutter app inspired by Gemini. It utilizes the Gemini API to build an AI chatbot. Users can
+    have interactive conversations with Gemini, utilize the image-to-text feature, and explore a range of
+    AI-driven functionalities.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+To run any Android application built with Flutter you need to configure the enviroments in your machine, you can do this following the the tutorial provided by Google in [Flutter website](https://flutter.dev/docs/get-started/install)
 
-A few resources to get you started if this is your first Flutter project:
+- Flutter SDK
+- Android Studio (to download Android SDK)
+- Xcode (for iOS develop only)
+- Any IDE with Flutter SDK installed (ie. IntelliJ, Android Studio, VSCode etc)
+- A little knowledge of Dart and Flutter
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Technologies
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Flutter
+- Clean Architecture
+- Bloc
+- Supabase - backend as service
+
+## Setup
+
+1. Clone the repository
+2. Open the project in your preferred IDE (e.g. Android Studio, VS Code)
+3. Run `flutter pub get` to install the required dependencies
+4. Add .env file and API key.
+5. Run the project in an emulator or on a physical device
+
+## Screenshots
+
+<p align="center">
+  <img src="screenshots/Screenshot_1.jpg" alt="Screenshot 1" width="150">
+  <img src="screenshots/Screenshot_2.jpg" alt="Screenshot 2" width="150">
+  <img src="screenshots/Screenshot_3.jpg" alt="Screenshot 3" width="150">
+  <img src="screenshots/Screenshot_4.jpg" alt="Screenshot 4" width="150">
+  <img src="screenshots/Screenshot_5.jpg" alt="Screenshot 5" width="150">
+</p>
+<p align="center">
+  <img src="screenshots/Screenshot_6.jpg" alt="Screenshot 6" width="150" style="vertical-align: top;">
+  <img src="screenshots/Screenshot_7.jpg" alt="Screenshot 7" width="150" style="vertical-align: top;">
+  <img src="screenshots/Screenshot_8.jpg" alt="Screenshot 8" width="150" style="vertical-align: top;">
+  <img src="screenshots/Screenshot_9.jpg" alt="Screenshot 9" width="150" style="vertical-align: top;">
+  <img src="screenshots/Screenshot_10.gif" alt="Screenshot 10" width="150" style="vertical-align: top;">
+</p>
+<p align="center">
+  <img src="screenshots/Screenshot_11.jpg" alt="Screenshot 11" width="150" style="vertical-align: top;">
+  <img src="screenshots/Screenshot_12.jpg" alt="Screenshot 12" width="150" style="vertical-align: top;">
+</p>
+
+# References

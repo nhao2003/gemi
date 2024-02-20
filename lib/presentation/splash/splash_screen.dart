@@ -66,6 +66,9 @@ class _SplashScreenState extends State<SplashScreen> {
                         ],
                       ),
                     ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.01,
+                    ),
                     ConstrainedBox(
                       constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width * 0.5,
@@ -76,6 +79,9 @@ class _SplashScreenState extends State<SplashScreen> {
                           color: Colors.white70,
                         ),
                       ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.1,
                     ),
                     ElevatedButton(
                       child: const Text('Get Started'),
