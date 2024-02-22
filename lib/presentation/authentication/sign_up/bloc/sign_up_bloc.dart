@@ -21,8 +21,8 @@ class SignUpBloc extends Bloc<SignUpEvent, SignUpState> {
           email: event.email,
           password: event.password,
           data: {
-            'firstName': event.firstName,
-            'lastName': event.lastName,
+            'first_name': event.firstName,
+            'last_name': event.lastName,
           });
       result.fold(
         (l) => emit(SignUpFailure(message: (l).message)),

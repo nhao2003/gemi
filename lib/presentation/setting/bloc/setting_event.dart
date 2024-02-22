@@ -18,4 +18,6 @@ class SetSafetyCategorySettings extends SettingEvent {
   List<Object> get props => [safetyCategorySettings];
 }
 
+class ClearAllChatHistory extends SettingEvent {}
+
 class SignOut extends SettingEvent {}

@@ -1,4 +1,4 @@
-import 'package:flutter/src/material/app.dart';
+import 'package:flutter/material.dart';
 import 'package:gemi/data/data_source/local/setting_local_data_source.dart';
 
 import 'package:gemi/data/model/gemini/gemini_safety/safety_category.dart';

@@ -1,14 +1,16 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import '../../../domain/enums/enums.dart';
 
 class ImageGrid extends StatelessWidget {
   final List<String> images;
   final Function(int index)? onMediaTap;
 
-  const ImageGrid(this.images, {Key? key, this.onMediaTap}) : super(key: key);
+  const ImageGrid(this.images, {super.key, this.onMediaTap});
 
   int _columnCount(double width) {
     Breakpoint breakpoint = Breakpoint.fromWidth(width);
@@ -36,6 +38,21 @@ class ImageGrid extends StatelessWidget {
     }
   }
 
+  Widget _image(String url) {
+    bool isNetwork = url.startsWith('http') || url.startsWith('https');
+    if (isNetwork) {
+      return CachedNetworkImage(
+        imageUrl: url,
+        fit: BoxFit.cover,
+      );
+    } else {
+      return Image.file(
+        File(url),
+        fit: BoxFit.cover,
+      );
+    }
+  }
+
   Widget _mobileView() {
     return GridView.builder(
       shrinkWrap: true,
@@ -51,11 +68,11 @@ class ImageGrid extends StatelessWidget {
           key: ValueKey(index),
           borderRadius: BorderRadius.circular(5),
           child: InkWell(
-            onTap: onMediaTap != null ? () => onMediaTap!(index) : null,
-            child: Image.file(
-              File(images[index]),
-              fit: BoxFit.cover,
-            ),
+            onTap: () {
+              print(images[index]);
+              //onMediaTap?.call(index);
+            },
+            child: _image(images[index]),
           ),
         );
       },
@@ -81,14 +98,14 @@ class ImageGrid extends StatelessWidget {
                       borderRadius: BorderRadius.circular(5),
                       child: InkWell(
                         onTap: onMediaTap != null
-                            ? () => onMediaTap!(images.indexOf(images[index]))
+                            ? () {
+                                // onMediaTap!(images.indexOf(images[index]));
+                                print(images[index]);
+                              }
                             : null,
                         child: AspectRatio(
                           aspectRatio: 1,
-                          child: Image.file(
-                            File(images[index]),
-                            fit: BoxFit.cover,
-                          ),
+                          child: _image(images[index]),
                         ),
                       ),
                     ),

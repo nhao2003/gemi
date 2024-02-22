@@ -22,23 +22,21 @@ class LocalDataBase {
           'user_id TEXT,'
           'name TEXT,'
           'last_message_date TEXT,'
-          'created_at TEXT,'
-          'updated_at TEXT'
+          'created_at TEXT'
           ')',
         );
 
         await db.execute(
           'CREATE TABLE prompts ('
           'id TEXT PRIMARY KEY,'
+          'user_id TEXT,'
           'conversation_id TEXT,'
-          'parent_id TEXT,'
           'role TEXT,'
           'images TEXT,'
           'text TEXT,'
           'is_good_response INTEGER,'
           'created_at TEXT,'
-          'updated_at TEXT,'
-          'version INTEGER'
+          'updated_at TEXT'
           ')',
         );
 

@@ -3,15 +3,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemi/data/data_source/local/local_database.dart';
+import 'package:gemi/data/data_source/remote/auth_remote_data_source/auth_remote_data_source.dart';
 import 'package:gemi/dependency_container.dart';
 import 'package:gemi/presentation/authentication/forgot_password/forgot_password_screen.dart';
 import 'package:gemi/presentation/authentication/sign_up/bloc/sign_up_bloc.dart';
 import 'package:gemi/presentation/home/home_screen.dart';
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
 import 'package:gemi/presentation/setting/setting_screen.dart';
-import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -51,7 +50,8 @@ class MyApp extends StatelessWidget {
             backgroundColor: Colors.white,
           ),
         ),
-        initialRoute: '/splash',
+        initialRoute:
+            sl<AuthRemoteDataSource>().isAuthenticated ? '/home' : '/splash',
         routes: {
           '/home': (context) => const HomeScreen(
                 title: "Gemini",
@@ -60,7 +60,8 @@ class MyApp extends StatelessWidget {
           'sign_up': (context) => const SignUpScreen(),
           '/splash': (context) => const SplashScreen(),
           '/setting': (context) => const SettingScreen(),
-          'forgot_password': (context) => const ForgotPasswordScreen()
+          'forgot_password': (context) => const ForgotPasswordScreen(),
+          'setting': (context) => const SettingScreen(),
         });
   }
 }

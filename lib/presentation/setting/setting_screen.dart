@@ -27,10 +27,25 @@ class _SettingScreenState extends State<SettingScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              ListTile(
-                leading: const Icon(Icons.account_circle),
-                title: const Text("Account"),
-                onTap: () {},
+              BlocBuilder<SettingBloc, SettingState>(
+                builder: (context, state) {
+                  String title = "Sign in";
+                  final user = context.read<SettingBloc>().user;
+                  if (user != null) {
+                    String firstName = user.userMetadata?["first_name"] ?? "";
+                    String lastName = user.userMetadata?["last_name"] ?? "";
+
+                    if (firstName.isEmpty && lastName.isEmpty) {
+                      firstName = "Unknown";
+                    }
+                    title = "$firstName $lastName";
+                  }
+                  return ListTile(
+                    leading: const Icon(Icons.account_circle),
+                    title: Text(title),
+                    onTap: () {},
+                  );
+                },
               ),
               ListTile(
                 leading: const Icon(Icons.security),
@@ -72,24 +87,34 @@ class _SettingScreenState extends State<SettingScreen> {
                   showDialog(
                     context: context,
                     builder: (context) {
-                      return AlertDialog(
-                        title: const Text("Clear all chat history"),
-                        content: const Text(
-                            "Are you sure you want to clear all chat history?"),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Cancel"),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text("Clear"),
-                          ),
-                        ],
+                      return BlocProvider.value(
+                        value: sl<SettingBloc>(),
+                        child: BlocBuilder<SettingBloc, SettingState>(
+                          builder: (context, state) {
+                            return AlertDialog(
+                              title: const Text("Clear all chat history"),
+                              content: const Text(
+                                  "Are you sure you want to clear all chat history?"),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text("Cancel"),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    context
+                                        .read<SettingBloc>()
+                                        .add(ClearAllChatHistory());
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: const Text("Clear"),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
                       );
                     },
                   );

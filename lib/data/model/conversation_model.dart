@@ -7,13 +7,12 @@ part 'conversation_model.g.dart';
 
 @JsonSerializable()
 class ConversationModel extends Conversation {
-  const ConversationModel({
-    required super.id,
+  ConversationModel({
+    super.id,
     required super.userId,
     required super.name,
     super.lastMessageDate,
     super.createdAt,
-    super.updatedAt,
   });
   @override
   factory ConversationModel.fromJson(Map<String, dynamic> json) {
@@ -27,4 +26,14 @@ class ConversationModel extends Conversation {
   }
 
   Map<String, dynamic> toJson() => _$ConversationModelToJson(this);
+
+  factory ConversationModel.create({
+    required String userId,
+    required String name,
+  }) {
+    return ConversationModel(
+      userId: userId,
+      name: name,
+    );
+  }
 }

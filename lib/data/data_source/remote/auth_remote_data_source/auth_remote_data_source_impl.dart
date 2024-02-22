@@ -11,7 +11,10 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   AuthRemoteDataSourceImpl(this._supabaseClient);
 
   @override
-  Future<void> signUpWithEmailAndPassword({
+  User? get user => _supabaseClient.auth.currentUser;
+
+  @override
+  Future<AuthResponse> signUpWithEmailAndPassword({
     required String email,
     required String password,
     Map<String, dynamic>? data,
@@ -20,44 +23,55 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       final res = await _supabaseClient.auth.signUp(
         email: email,
         password: password,
+        data: data,
       );
-      print(res.toString());
+      return res;
+    } on AuthException catch (e) {
+      log(e.toString());
+      throw RemoteDataSourceException(
+        message: e.message,
+        statusCode: e.statusCode,
+      );
     } catch (e) {
-      if (e is AuthException) {
-        log(e.toString());
-        throw RemoteDataSourceException(
-          message: e.message,
-          statusCode: e.statusCode,
-        );
-      } else {
-        log(e.toString());
-        throw RemoteDataSourceException(message: e.toString());
-      }
+      log(e.toString());
+      throw RemoteDataSourceException(
+        message: e.toString(),
+      );
     }
   }
 
   @override
-  Future<void> signInWithEmailAndPassword({
+  Future<AuthResponse> signInWithEmailAndPassword({
     required String email,
     required String password,
   }) async {
-    final res = await _supabaseClient.auth.signInWithPassword(
-      email: email,
-      password: password,
-    );
+    try {
+      final res = await _supabaseClient.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
 
-    log(res.toString());
+      log(res.toString());
+      return res;
+    } on AuthException catch (e) {
+      log(e.toString());
+      throw RemoteDataSourceException(
+        message: e.message,
+        statusCode: e.statusCode,
+      );
+    } catch (e) {
+      log(e.toString());
+      throw RemoteDataSourceException(
+        message: e.toString(),
+      );
+    }
   }
 
   @override
-  bool isUserAuthenticated() {
-    final user = _supabaseClient.auth.currentUser;
-    return user != null;
-  }
+  bool get isAuthenticated => _supabaseClient.auth.currentUser != null;
 
   @override
   Future<void> signOut() {
-    // return _supabaseClient.auth.signOut();
-    return Future.value();
+    return _supabaseClient.auth.signOut();
   }
 }

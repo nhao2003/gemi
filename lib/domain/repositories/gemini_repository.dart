@@ -2,24 +2,26 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter/foundation.dart';
 import 'package:gemi/domain/entities/conversation.dart';
 
+import '../../core/errors/failure.dart';
 import '../../data/model/gemini/gemini_safety/safety_setting.dart';
 import '../../data/model/gemini/generation_config/generation_config.dart';
 import '../entities/prompt.dart';
 
 abstract class GeminiRepository {
   bool get isGenerating;
-  Stream<Either<Exception, Prompt?>> generatePrompt({
+  Stream<Conversation> get conversationStream;
+  Stream<Either<Failure, Prompt?>> generatePrompt({
     String? text,
     List<String>? images,
     String? conversationId,
   });
-  Stream<Either<Exception, Prompt?>> streamGeneratedPrompt({
+  Stream<Either<Failure, Prompt?>> streamGeneratedPrompt({
     String? text,
     List<String>? images,
     String? conversationId,
   });
 
-  Stream<Either<Exception, Prompt?>> streamGenerateChat(
+  Stream<Either<Failure, Prompt?>> streamGenerateChat(
     String text, {
     List<Prompt> chats = const [],
     String? conversationId,
@@ -28,22 +30,20 @@ abstract class GeminiRepository {
     GenerationConfig? generationConfig,
   });
 
-  Future<Either<Exception, List<Conversation>>> getConversations();
+  Future<Either<Failure, List<Conversation>>> getConversations();
 
-  Future<Either<Exception, Conversation>> createConversation({
-    required String name,
-  });
-
-  Future<Either<Exception, List<Prompt>>> getPrompts({
+  Future<Either<Failure, List<Prompt>>> getPrompts({
     required String conversationId,
   });
 
-  Future<Either<Exception, void>> deleteConversation({
+  Future<Either<Failure, void>> deleteConversation({
     required String conversationId,
   });
 
-  Future<Either<Exception, Prompt?>> markGoodOrBadResponse({
+  Future<Either<Failure, Prompt?>> markGoodOrBadResponse({
     required Prompt prompt,
     required bool? isGoodResponse,
   });
+
+  Future<Either<Failure, void>> clearConversations();
 }

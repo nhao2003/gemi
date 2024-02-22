@@ -1,11 +1,9 @@
-import 'dart:math';
+import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:gemi/domain/repositories/gemini_repository.dart';
 
-import '../../../data/model/gemini/content/content.dart';
-import '../../../dependency_container.dart';
 import '../../../domain/entities/conversation.dart';
 import '../../../domain/entities/prompt.dart';
 
@@ -13,8 +11,18 @@ part 'home_event.dart';
 part 'home_state.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  final GeminiRepository _geminiRepository = sl<GeminiRepository>();
-  HomeBloc() : super(const HomeLoading()) {
+  final GeminiRepository _geminiRepository;
+  late final StreamController<List<Conversation>> _conversationStream =
+      StreamController<List<Conversation>>.broadcast();
+  Stream<List<Conversation>> get conversationStream =>
+      _conversationStream.stream;
+  final List<Conversation> _conversations = [];
+  List<Conversation> get conversations => _conversations;
+  HomeBloc(this._geminiRepository) : super(const HomeLoading()) {
+    _geminiRepository.conversationStream.listen((event) {
+      _conversations.add(event);
+      _conversationStream.add(_conversations);
+    });
     on<HomeEvent>((event, emit) {
       // TODO: implement event handler
       print(state.runtimeType.toString());
@@ -22,7 +30,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<HomeConversationSelected>((event, emit) async {
       final result = await _geminiRepository.getPrompts(
           conversationId: event.conversationId);
-      final conversations = [...?state.conversations];
       emit(const HomeLoading());
       result.fold((l) {
         emit(const HomeLoading());
@@ -31,7 +38,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
           prompts: r,
           currentConversationId: event.conversationId,
           isGenerating: false,
-          conversations: conversations,
         ));
       });
     });
@@ -41,29 +47,20 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       result.fold((l) {
         emit(const HomeLoading());
       }, (r) {
-        emit(HomeNewChat(conversations: r));
+        _conversations.clear();
+        _conversations.addAll(r);
+        _conversationStream.add(_conversations);
+        emit(const HomeNewChat());
       });
     });
 
     on<HomePromptSubmitted>((event, emit) async {
       final prompts = [...?state.prompts];
       String? conversationId = state.currentConversationId;
-
-      if (conversationId == null) {
-        final res = (await _geminiRepository.createConversation(
-            name: event.text ?? "Untitled Conversation"));
-        res.fold((l) {
-          emit(const HomeLoading());
-        }, (r) {
-          conversationId = r.id;
-        });
-      }
-      // copyWith
       final newState = HomeOnChat(
         prompts: prompts,
         currentConversationId: conversationId,
         isGenerating: true,
-        conversations: state.conversations,
       );
       emit(newState);
       final result = _geminiRepository.streamGeneratedPrompt(
@@ -78,7 +75,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             prompts: prompts,
             currentConversationId: conversationId,
             isGenerating: false,
-            conversations: state.conversations,
           ));
         }, (r) {
           final index = prompts.indexWhere((element) => element.id == r?.id);
@@ -91,7 +87,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             prompts: [...prompts],
             currentConversationId: conversationId,
             isGenerating: state.isGenerating,
-            conversations: state.conversations,
           );
           emit(newState);
         });
@@ -105,9 +100,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       final result = await _geminiRepository.deleteConversation(
         conversationId: event.conversationId,
       );
-      final conversations = [...?state.conversations];
+      final conversations = [..._conversations];
+      _conversationStream.add(conversations);
       result.fold((l) {
-        print("Error: $l");
         emit(const HomeLoading());
       }, (r) {
         conversations
@@ -118,10 +113,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             prompts: state.prompts,
             currentConversationId: state.currentConversationId,
             isGenerating: state.isGenerating,
-            conversations: conversations,
           ));
         } else {
-          emit(HomeNewChat(conversations: conversations));
+          emit(const HomeNewChat());
         }
       });
     });
@@ -133,10 +127,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         isGoodResponse: event.isGoodResponse,
       );
       prompt.fold((l) {
-        print("Error: $l");
+        throw l;
       }, (r) {
-        print("Prompts: ${prompts}");
-        print("PromptR: ${r?.isGoodResponse}");
         final index = prompts.indexWhere((element) => element.id == r?.id);
         if (index != -1 && r != null) {
           prompts[index] = r;
@@ -144,7 +136,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             prompts: prompts,
             currentConversationId: state.currentConversationId,
             isGenerating: state.isGenerating,
-            conversations: state.conversations,
           );
           emit(newState);
         } else {}

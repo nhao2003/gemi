@@ -35,7 +35,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
       {String? modelName,
       List<SafetySetting>? safetySettings,
       GenerationConfig? generationConfig}) async {
-    // // Gemini.instance.typeProvider?.clear();
     'https://generativelanguage.googleapis.com/v1beta/models/YOUR_MODEL:generateContent?key=YOUR_API_KEY';
     final response = await api.post(
       "${modelName ?? GeminiConstants.defaultModel}:${GeminiConstants.defaultGenerateType}",
@@ -44,7 +43,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
       safetySettings: safetySettings,
     );
 
-    // // Gemini.instance.typeProvider?.loading = false;
     return GeminiResponse.fromJson(response.data).candidates?.lastOrNull;
   }
 
@@ -53,7 +51,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
       {String? modelName,
       List<SafetySetting>? safetySettings,
       GenerationConfig? generationConfig}) async {
-    // Gemini.instance.typeProvider?.clear();
     final response = await api.post(
       "${modelName ?? GeminiConstants.defaultModel}:countTokens",
       data: {
@@ -68,7 +65,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
       generationConfig: generationConfig,
       safetySettings: safetySettings,
     );
-    // Gemini.instance.typeProvider?.loading = false;
     return response.data?['totalTokens'];
   }
 
@@ -77,15 +73,12 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
     // Gemini.instance.typeProvider?.clear();
     final response = await api.get('models/$model');
 
-    // Gemini.instance.typeProvider?.loading = false;
     return GeminiModel.fromJson(response.data);
   }
 
   @override
   Future<List<GeminiModel>> listModels() async {
-    // Gemini.instance.typeProvider?.clear();
     final response = await api.get('models');
-    // Gemini.instance.typeProvider?.loading = false;
     return GeminiModel.jsonToList(response.data['models']);
   }
 
@@ -96,8 +89,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
     List<SafetySetting>? safetySettings,
     GenerationConfig? generationConfig,
   }) async* {
-    // Gemini.instance.typeProvider?.clear();
-
     final response = await api.post(
       '${modelName ?? GeminiConstants.defaultModel}:streamGenerateContent',
       isStreamResponse: true,
@@ -106,8 +97,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
       safetySettings: safetySettings,
     );
 
-    // Gemini.instance.typeProvider?.loading = false;
-    // return GeminiResponse.fromJson(response.data).Candidate?.lastOrNull;
     if (response.statusCode == 200) {
       final ResponseBody rb = response.data;
       int index = 0;
@@ -128,19 +117,17 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
           continue;
         }
 
-        res = res.trim();
+        String check = res.trim();
 
-        if (index == 0 && res.startsWith("[")) {
+        if (index == 0 && check.startsWith("[")) {
           res = res.replaceFirst('[', '');
         }
-        if (res.startsWith(',')) {
+        if (check.startsWith(',')) {
           res = res.replaceFirst(',', '');
         }
-        if (res.endsWith(']')) {
+        if (check.endsWith(']')) {
           res = res.substring(0, res.length - 1);
         }
-
-        res = res.trim();
 
         for (final line in splitter.convert(res)) {
           if (modelStr == '' && line == ',') {
@@ -151,7 +138,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
             final candidate = Candidate.fromJson(
                 (jsonDecode(modelStr)['candidates'] as List?)?.firstOrNull);
             yield candidate;
-            // Gemini.instance.typeProvider?.add(candidate.output);
             modelStr = '';
           } catch (e) {
             continue;
@@ -168,8 +154,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
       String? modelName,
       List<SafetySetting>? safetySettings,
       GenerationConfig? generationConfig}) async* {
-    // Gemini.instance.typeProvider?.clear();
-
     final response = await api.post(
       '${modelName ?? ((images?.isNotEmpty ?? false) ? 'models/gemini-pro-vision' : GeminiConstants.defaultModel)}:streamGenerateContent',
       isStreamResponse: true,
@@ -191,7 +175,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
       generationConfig: generationConfig,
       safetySettings: safetySettings,
     );
-    // Gemini.instance.typeProvider?.loading = false;
 
     if (response.statusCode == 200) {
       final ResponseBody rb = response.data;
@@ -214,19 +197,17 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
           continue;
         }
 
-        res = res.trim();
+        String check = res = res.trim();
 
-        if (index == 0 && res.startsWith("[")) {
+        if (index == 0 && check.startsWith("[")) {
           res = res.replaceFirst('[', '');
         }
-        if (res.startsWith(',')) {
+        if (check.startsWith(',')) {
           res = res.replaceFirst(',', '');
         }
-        if (res.endsWith(']')) {
+        if (check.endsWith(']')) {
           res = res.substring(0, res.length - 1);
         }
-
-        res = res.trim();
 
         for (final line in splitter.convert(res)) {
           if (modelStr == '' && line == ',') {
@@ -237,7 +218,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
             final candidate = Candidate.fromJson(
                 (jsonDecode(modelStr)['candidates'] as List?)?.firstOrNull);
             yield candidate;
-            // Gemini.instance.typeProvider?.add(candidate.output);
             modelStr = '';
           } catch (e) {
             continue;
@@ -255,7 +235,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
       String? modelName,
       List<SafetySetting>? safetySettings,
       GenerationConfig? generationConfig}) async {
-    // Gemini.instance.typeProvider?.clear();
     final response = await api.post(
       "${modelName ?? 'models/gemini-pro-vision'}:${GeminiConstants.defaultGenerateType}",
       data: {
@@ -265,7 +244,7 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
               {"text": text},
               ...images.map((e) => {
                     "inline_data": {
-                      "mime_type": "image/jpeg",
+                      "mimeType": "image/jpeg",
                       "data": base64Encode(e)
                     }
                   })
@@ -276,7 +255,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
       generationConfig: generationConfig,
       safetySettings: safetySettings,
     );
-    // Gemini.instance.typeProvider?.loading = false;
     return GeminiResponse.fromJson(response.data).candidates?.lastOrNull;
   }
 
@@ -285,7 +263,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
       {String? modelName,
       List<SafetySetting>? safetySettings,
       GenerationConfig? generationConfig}) async {
-    // Gemini.instance.typeProvider?.clear();
     final response = await api.post(
       "${modelName ?? GeminiConstants.defaultModel}:${GeminiConstants.defaultGenerateType}",
       data: {
@@ -303,7 +280,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
 
     final candidate =
         GeminiResponse.fromJson(response.data).candidates?.lastOrNull;
-    // Gemini.instance.typeProvider?.add(candidate?.output);
     return candidate;
   }
 
@@ -331,7 +307,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
       safetySettings: safetySettings,
     );
 
-    // Gemini.instance.typeProvider?.loading = false;
     return (response.data['embeddings'] as List)
         .map((e) => (e['values'] as List).cast<num>())
         .toList();
@@ -342,7 +317,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
       {String? modelName,
       List<SafetySetting>? safetySettings,
       GenerationConfig? generationConfig}) async {
-    // Gemini.instance.typeProvider?.clear();
     final response = await api.post(
       "${modelName ?? 'models/embedding-001'}:embedContent",
       data: {
@@ -356,7 +330,6 @@ class GeminiRemoteDataSourceImpl implements GeminiRemoteDataSource {
       generationConfig: generationConfig,
       safetySettings: safetySettings,
     );
-    // Gemini.instance.typeProvider?.loading = false;
     return (response.data['embedding']['values'] as List).cast<num>();
   }
 }

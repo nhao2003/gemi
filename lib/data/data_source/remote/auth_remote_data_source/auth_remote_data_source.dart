@@ -1,15 +1,18 @@
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 abstract class AuthRemoteDataSource {
-  Future<void> signUpWithEmailAndPassword({
+  Future<AuthResponse> signUpWithEmailAndPassword({
     required String email,
     required String password,
     Map<String, dynamic>? data,
   });
 
-  Future<void> signInWithEmailAndPassword({
+  Future<AuthResponse> signInWithEmailAndPassword({
     required String email,
     required String password,
   });
 
-  bool isUserAuthenticated();
+  bool get isAuthenticated;
   Future<void> signOut();
+  User? get user;
 }

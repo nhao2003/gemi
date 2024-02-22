@@ -3,8 +3,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gemi/data/repository/gemini_repository_impl.dart';
 import 'package:gemi/data/stream_data.dart';
 import 'package:gemi/domain/entities/conversation.dart';
+import 'package:gemi/presentation/home/bloc/home_bloc.dart';
 
-import '../../../data/data_source/local/gemini_local_data_source.dart';
+import '../../../data/data_source/local/gemini_local_data_source/gemini_local_data_source_impl.dart';
 import '../../../data/data_source/local/local_database.dart';
 import '../../../data/data_source/remote/gemini_remote_data_source/gemini_remote_data_source.dart';
 import '../../../core/resource/assets.dart';
@@ -15,12 +16,14 @@ class GeminiDrawer extends StatelessWidget {
   final Function() onNewConversationSelected;
   final List<Conversation> conversations;
   final Function(String) onConversationDeleted;
+  final Function() onSettingsSelected;
   const GeminiDrawer({
     super.key,
     required this.onConversationSelected,
     required this.onNewConversationSelected,
     required this.conversations,
     required this.onConversationDeleted,
+    required this.onSettingsSelected,
   });
   @override
   Widget build(BuildContext context) {
@@ -102,11 +105,7 @@ class GeminiDrawer extends StatelessWidget {
               ),
             ),
             ListTile(
-              onTap: () {
-                // Back and return the selected conversation id
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const SettingScreen()));
-              },
+              onTap: onSettingsSelected,
               title: Text(
                 'Settings',
                 style: Theme.of(context).textTheme.bodyMedium,

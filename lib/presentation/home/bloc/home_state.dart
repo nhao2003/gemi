@@ -1,12 +1,10 @@
 part of 'home_bloc.dart';
 
 sealed class HomeState extends Equatable {
-  final List<Conversation>? conversations;
   final List<Prompt>? prompts;
   final bool isGenerating;
   final String? currentConversationId;
   const HomeState({
-    this.conversations,
     this.prompts,
     this.isGenerating = false,
     this.currentConversationId,
@@ -14,9 +12,7 @@ sealed class HomeState extends Equatable {
 
   @override
   List<Object> get props => [
-        conversations ?? [],
         prompts ?? [],
-        (conversations.hashCode),
         (prompts.hashCode),
         isGenerating,
         currentConversationId ?? '',
@@ -31,7 +27,7 @@ sealed class HomeState extends Equatable {
 }
 
 final class HomeLoading extends HomeState {
-  const HomeLoading() : super(conversations: null, prompts: null);
+  const HomeLoading() : super(prompts: null);
 
   @override
   HomeState copyWith(
@@ -45,7 +41,6 @@ final class HomeLoading extends HomeState {
 
 final class HomeOnChat extends HomeState {
   const HomeOnChat({
-    required super.conversations,
     required super.currentConversationId,
     required super.prompts,
     required super.isGenerating,
@@ -59,7 +54,6 @@ final class HomeOnChat extends HomeState {
     String? currentConversationId,
   }) {
     return HomeOnChat(
-      conversations: conversations ?? super.conversations,
       currentConversationId:
           currentConversationId ?? super.currentConversationId,
       prompts: prompts ?? super.prompts,
@@ -69,9 +63,7 @@ final class HomeOnChat extends HomeState {
 }
 
 final class HomeNewChat extends HomeState {
-  const HomeNewChat({
-    required super.conversations,
-  }) : super(currentConversationId: null);
+  const HomeNewChat() : super(currentConversationId: null);
 
   @override
   HomeNewChat copyWith({
@@ -80,8 +72,6 @@ final class HomeNewChat extends HomeState {
     bool? isGenerating,
     String? currentConversationId,
   }) {
-    return HomeNewChat(
-      conversations: conversations ?? super.conversations,
-    );
+    return HomeNewChat();
   }
 }

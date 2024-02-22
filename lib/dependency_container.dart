@@ -1,11 +1,14 @@
 import 'package:dio/dio.dart';
-import 'package:gemi/data/data_source/local/gemini_local_data_source.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:gemi/data/data_source/local/gemini_local_data_source/gemini_local_data_source_impl.dart';
+import 'package:gemi/data/data_source/local/local_data_storage/local_data_storage.dart';
 import 'package:gemi/data/data_source/local/local_database.dart';
 import 'package:gemi/data/data_source/local/setting_local_data_source.dart';
 import 'package:gemi/data/data_source/remote/auth_remote_data_source/auth_remote_data_source.dart';
 import 'package:gemi/data/data_source/remote/auth_remote_data_source/auth_remote_data_source_impl.dart';
 import 'package:gemi/data/data_source/remote/gemini_remote_data_source/gemini_remote_data_source.dart';
 import 'package:gemi/data/data_source/remote/gemini_remote_data_source/gemini_remote_data_source_impl.dart';
+import 'package:gemi/data/data_source/remote/remote_database/remote_database_impl.dart';
 import 'package:gemi/data/repository/auth_repository_impl.dart';
 import 'package:gemi/data/repository/gemini_repository_impl.dart';
 import 'package:gemi/domain/repositories/auth_repository.dart';
@@ -19,7 +22,11 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'data/data_source/remote/gemini_remote_data_source/gemini_constanst.dart';
 import 'data/data_source/remote/gemini_service/gemini_service.dart';
+import 'data/data_source/remote/remote_data_storage/remote_data_storage.dart';
+import 'data/data_source/remote/remote_data_storage/remote_data_storage_impl.dart';
+import 'data/repository/data_storage_repository_impl.dart';
 import 'data/repository/setting_repository_impl.dart';
+import 'domain/repositories/data_storage_repository.dart';
 import 'domain/repositories/setting_repository.dart';
 import 'presentation/setting/bloc/setting_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -35,11 +42,23 @@ Future<void> init() async {
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   ))
       .client;
+  sl.registerLazySingleton<LocalDataStorage>(() => LocalDataStorage(
+        DefaultCacheManager(),
+      ));
+  sl.registerLazySingleton<RemoteDataStorage>(() => RemoteDataStorageImpl(
+        supabaseClient,
+      ));
+
+  sl.registerLazySingleton<DataStorageRepository>(
+      () => DataStorageRepositoryImpl(
+            sl<LocalDataStorage>(),
+            sl<RemoteDataStorage>(),
+          ));
   sl.registerLazySingleton<SupabaseClient>(() => supabaseClient);
   sl.registerLazySingleton<SharedPreferences>(() => sp);
   sl.registerLazySingleton<GeminiLocalDataSourceImpl>(
       () => GeminiLocalDataSourceImpl(
-            database: LocalDataBase.instance.database,
+            database: localDatabase,
           ));
   sl.registerLazySingleton<GeminiRemoteDataSource>(
       () => GeminiRemoteDataSourceImpl(
@@ -52,10 +71,14 @@ Future<void> init() async {
               apiKey: dotenv.env['GEMINI_API_KEY']!,
             ),
           ));
-  sl.registerLazySingleton<GeminiRepository>(() => GeminiRepositoryImpl(
-        sl<GeminiLocalDataSourceImpl>(),
-        sl<GeminiRemoteDataSource>(),
+  sl.registerLazySingleton<GemiRemoteDatabase>(() => GemiRemoteDatabaseImpl(
+        supabaseClient,
       ));
+  sl.registerLazySingleton<GeminiRepository>(() => GeminiRepositoryImpl(
+      sl<GeminiLocalDataSourceImpl>(),
+      sl<GeminiRemoteDataSource>(),
+      sl<DataStorageRepository>(),
+      sl<GemiRemoteDatabase>()));
 
   sl.registerLazySingleton<AuthRemoteDataSource>(() => AuthRemoteDataSourceImpl(
         supabaseClient,
@@ -75,8 +98,11 @@ Future<void> init() async {
   sl.registerLazySingleton<SettingBloc>(() => SettingBloc(
         settingRepository: sl<SettingRepository>(),
         authRepository: sl<AuthRepository>(),
+        geminiRepository: sl<GeminiRepository>(),
       ));
-  sl.registerLazySingleton<HomeBloc>(() => HomeBloc());
+  sl.registerLazySingleton<HomeBloc>(() => HomeBloc(
+        sl<GeminiRepository>(),
+      ));
   sl.registerLazySingleton<SplashBloc>(() => SplashBloc(sl<AuthRepository>()));
   sl.registerLazySingleton<SignInBloc>(() => SignInBloc(sl<AuthRepository>()));
 }

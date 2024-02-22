@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemi/dependency_container.dart';
+import 'package:gemi/domain/entities/conversation.dart';
 import 'package:gemi/domain/entities/prompt.dart';
 import 'package:gemi/presentation/home/widgets/chat_input.dart';
 import 'package:gemi/presentation/home/widgets/gemini_drawer.dart';
@@ -74,124 +75,167 @@ class _HomeScreenState extends State<HomeScreen> {
         ? const EdgeInsets.symmetric(horizontal: 100)
         : const EdgeInsets.all(8);
     return BlocProvider(
-      create: (context) => sl<HomeBloc>()..add(HomeStarted()),
-      child: BlocBuilder<HomeBloc, HomeState>(
-        builder: (context, state) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(widget.title),
-            ),
-            drawer: breakpoint != Breakpoint.desktop
-                ? GeminiDrawer(
-                    key: UniqueKey(),
-                    conversations: state.conversations ?? [],
-                    onNewConversationSelected: () {
-                      context.read<HomeBloc>().add(HomeStarted());
-                    },
-                    onConversationSelected: (id) => context
-                        .read<HomeBloc>()
-                        .add(HomeConversationSelected(id)),
-                    onConversationDeleted: (id) {
-                      context.read<HomeBloc>().add(HomeConversationDeleted(id));
-                    },
-                  )
-                : null,
-            body: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                breakpoint == Breakpoint.desktop
-                    ? GeminiDrawer(
-                        onNewConversationSelected: () {
-                          context.read<HomeBloc>().add(HomeStarted());
-                        },
-                        onConversationSelected: (id) => context
-                            .read<HomeBloc>()
-                            .add(HomeConversationSelected(id)),
-                        conversations: state.conversations ?? [],
-                        onConversationDeleted: (id) {
-                          context
-                              .read<HomeBloc>()
-                              .add(HomeConversationDeleted(id));
-                        },
-                      )
-                    : const SizedBox.shrink(),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (state is HomeLoading)
-                        const Expanded(
-                          child: Center(
-                            child: CircularProgressIndicator(),
-                          ),
-                        )
-                      else if (state is HomeNewChat)
-                        const Expanded(
-                          child: HomeWelcome(),
-                        )
-                      else
-                        Expanded(
-                            child: ListView.builder(
-                          cacheExtent: 2000,
-                          padding: breakpoint == Breakpoint.mobile
-                              ? const EdgeInsets.all(8)
-                              : const EdgeInsets.only(
-                                  top: 16, left: 100, right: 100),
-                          itemCount: state.prompts!.length + 1,
-                          controller: _scrollController,
-                          itemBuilder: (context, index) {
-                            if (index < state.prompts!.length) {
-                              return MessageBubble(
+        create: (context) => sl<HomeBloc>()..add(HomeStarted()),
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(widget.title),
+          ),
+          drawer: breakpoint != Breakpoint.desktop
+              ? BlocBuilder<HomeBloc, HomeState>(
+                  builder: (context, state) {
+                    return StreamBuilder<List<Conversation>>(
+                        stream: context.read<HomeBloc>().conversationStream,
+                        builder: (context, snapshot) {
+                          List<Conversation> conversations =
+                              List<Conversation>.from(
+                                  context.read<HomeBloc>().conversations);
+                          return GeminiDrawer(
+                            key: UniqueKey(),
+                            conversations: conversations,
+                            onNewConversationSelected: () {
+                              context.read<HomeBloc>().add(HomeStarted());
+                            },
+                            onConversationSelected: (id) => context
+                                .read<HomeBloc>()
+                                .add(HomeConversationSelected(id)),
+                            onConversationDeleted: (id) {
+                              context
+                                  .read<HomeBloc>()
+                                  .add(HomeConversationDeleted(id));
+                            },
+                            onSettingsSelected: () {
+                              Navigator.of(context)
+                                  .pushNamed("setting")
+                                  .then((value) {
+                                context.read<HomeBloc>().add(HomeStarted());
+                              });
+                            },
+                          );
+                        });
+                  },
+                )
+              : null,
+          body: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              breakpoint == Breakpoint.desktop
+                  ? BlocBuilder<HomeBloc, HomeState>(
+                      builder: (context, state) {
+                        return StreamBuilder<List<Conversation>>(
+                            stream: context.read<HomeBloc>().conversationStream,
+                            builder: (context, snapshot) {
+                              List<Conversation>? conversations =
+                                  List<Conversation>.from(snapshot.data ?? []);
+                              return GeminiDrawer(
                                 key: UniqueKey(),
-                                prompt: state.prompts![index],
-                                isLastResponse:
-                                    index == state.prompts!.length - 1,
-                                onButtonPressed: (type) {
-                                  likeButtonPressed(
-                                      context, state.prompts![index], type);
+                                conversations: conversations,
+                                onNewConversationSelected: () {
+                                  context.read<HomeBloc>().add(HomeStarted());
+                                },
+                                onConversationSelected: (id) => context
+                                    .read<HomeBloc>()
+                                    .add(HomeConversationSelected(id)),
+                                onConversationDeleted: (id) {
+                                  context
+                                      .read<HomeBloc>()
+                                      .add(HomeConversationDeleted(id));
+                                },
+                                onSettingsSelected: () {
+                                  Navigator.of(context)
+                                      .pushNamed("setting")
+                                      .then((value) {
+                                    // context.read<HomeBloc>().add(HomeStarted());
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text("Settings Updated"),
+                                      ),
+                                    );
+                                  });
                                 },
                               );
-                            } else {
-                              return Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Visibility(
-                                    visible: state.isGenerating,
-                                    child: SizedBox(
-                                      width: 40,
-                                      height: 40,
-                                      child:
-                                          Image.asset(Assets.sparkleThinking),
+                            });
+                      },
+                    )
+                  : const SizedBox.shrink(),
+              BlocBuilder<HomeBloc, HomeState>(
+                builder: (context, state) {
+                  return Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (state is HomeLoading)
+                          const Expanded(
+                            child: Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
+                        else if (state is HomeNewChat)
+                          const Expanded(
+                            child: HomeWelcome(),
+                          )
+                        else
+                          Expanded(
+                              child: ListView.builder(
+                            cacheExtent: 2000,
+                            padding: breakpoint == Breakpoint.mobile
+                                ? const EdgeInsets.all(8)
+                                : const EdgeInsets.only(
+                                    top: 16, left: 100, right: 100),
+                            itemCount: state.prompts!.length + 1,
+                            controller: _scrollController,
+                            itemBuilder: (context, index) {
+                              if (index < state.prompts!.length) {
+                                return MessageBubble(
+                                  key: UniqueKey(),
+                                  prompt: state.prompts![index],
+                                  isLastResponse:
+                                      index == state.prompts!.length - 1,
+                                  onButtonPressed: (type) {
+                                    likeButtonPressed(
+                                        context, state.prompts![index], type);
+                                  },
+                                );
+                              } else {
+                                return Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Visibility(
+                                      visible: state.isGenerating,
+                                      child: SizedBox(
+                                        width: 40,
+                                        height: 40,
+                                        child:
+                                            Image.asset(Assets.sparkleThinking),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              );
-                            }
+                                  ],
+                                );
+                              }
+                            },
+                          )),
+                        GemiTextField(
+                          padding: padding,
+                          onSend: (text, images) async {
+                            context.read<HomeBloc>().add(
+                                  HomePromptSubmitted(
+                                      text: text,
+                                      images:
+                                          images?.map((e) => e.path).toList(),
+                                      onPromptSubmitted: _scrollDown),
+                                );
                           },
-                        )),
-                      GemiTextField(
-                        padding: padding,
-                        onSend: (text, images) async {
-                          context.read<HomeBloc>().add(
-                                HomePromptSubmitted(
-                                    text: text,
-                                    images: images?.map((e) => e.path).toList(),
-                                    onPromptSubmitted: _scrollDown),
-                              );
-                        },
-                        onTap: () {
-                          _scrollDown();
-                        },
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-          );
-        },
-      ),
-    );
+                          onTap: () {
+                            _scrollDown();
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              )
+            ],
+          ),
+        ));
   }
 }

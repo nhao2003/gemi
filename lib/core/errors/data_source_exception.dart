@@ -1,8 +1,9 @@
 abstract class DataSourceException implements Exception {
-  String? _message;
-
+  final String? _message;
+  dynamic data;
   DataSourceException({
-    required String? message,
+    String? message = 'An error occurred while fetching data',
+    this.data,
   }) : _message = message;
 
   String get message => _message!;
@@ -17,9 +18,10 @@ class RemoteDataSourceException extends DataSourceException {
   final String? statusCode;
 
   RemoteDataSourceException({
-    required String message,
+    super.message,
+    super.data,
     this.statusCode,
-  }) : super(message: message);
+  });
 
   @override
   String toString() {
@@ -29,8 +31,9 @@ class RemoteDataSourceException extends DataSourceException {
 
 class LocalDataSourceException extends DataSourceException {
   LocalDataSourceException({
-    required String message,
-  }) : super(message: message);
+    super.message,
+    super.data,
+  });
 
   @override
   String toString() {

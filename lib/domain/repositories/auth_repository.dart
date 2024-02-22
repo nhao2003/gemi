@@ -1,7 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:gemi/core/errors/failure.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class AuthRepository {
+  User? get user;
+
   Future<Either<Failure, void>> signUpWithEmailAndPassword({
     required String email,
     required String password,
@@ -15,5 +18,5 @@ abstract class AuthRepository {
 
   Future<Either<Failure, void>> signOut();
 
-  bool isUserAuthenticated();
+  bool get isAuthenticated;
 }

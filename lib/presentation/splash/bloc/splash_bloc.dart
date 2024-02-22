@@ -14,7 +14,7 @@ class SplashBloc extends Bloc<SplashEvent, SplashState> {
     });
 
     on<CheckUserAuthenticated>((event, emit) {
-      if (authRepository.isUserAuthenticated()) {
+      if (authRepository.isAuthenticated) {
         emit(UserAuthenticated());
       } else {
         emit(UserNotAuthenticated());
