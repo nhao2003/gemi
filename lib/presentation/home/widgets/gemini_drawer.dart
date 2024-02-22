@@ -32,9 +32,6 @@ class GeminiDrawer extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DrawerHeader(
-                child:
-                    Center(child: SvgPicture.asset(Assets.logoSingleColorV2))),
             Padding(
               padding: const EdgeInsets.only(left: 16, top: 16, bottom: 8),
               child: ElevatedButton.icon(
@@ -57,47 +54,55 @@ class GeminiDrawer extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: conversations.map((e) {
-                    return ListTile(
-                      onTap: () {
-                        Navigator.of(context).pop();
-                        onConversationSelected(e.id);
-                      },
-                      onLongPress: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return AlertDialog(
-                              title: const Text("Delete conversation"),
-                              content: const Text(
-                                  "Are you sure you want to delete this conversation?"),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text("Cancel"),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    onConversationDeleted(e.id);
-                                    Navigator.of(context).pop();
-                                  },
-                                  child: const Text("Delete"),
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                      title: Text(
-                        e.name,
-                        style: Theme.of(context).textTheme.bodyMedium,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      // Random icon
-                      leading: const Icon(
-                        Icons.chat_bubble_outline,
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: ListTile(
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(30),
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.of(context).pop();
+                          onConversationSelected(e.id);
+                        },
+                        onLongPress: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text("Delete conversation"),
+                                content: const Text(
+                                    "Are you sure you want to delete this conversation?"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text("Cancel"),
+                                  ),
+                                  TextButton(
+                                    onPressed: () {
+                                      onConversationDeleted(e.id);
+                                      Navigator.of(context).pop();
+                                    },
+                                    child: const Text("Delete"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        title: Text(
+                          e.name,
+                          style: Theme.of(context).textTheme.bodyMedium,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        // Random icon
+                        leading: const Icon(
+                          Icons.chat_bubble_outline,
+                        ),
                       ),
                     );
                   }).toList(),

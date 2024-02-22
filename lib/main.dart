@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gemi/core/resource/gemi_colors.dart';
 import 'package:gemi/data/data_source/local/local_database.dart';
 import 'package:gemi/data/data_source/remote/auth_remote_data_source/auth_remote_data_source.dart';
 import 'package:gemi/dependency_container.dart';
@@ -38,20 +39,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          // 4285f4
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.white,
-          ),
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xff4285f4),
-          ).copyWith(background: Colors.white),
-          drawerTheme: const DrawerThemeData(
-            backgroundColor: Colors.white,
-          ),
-        ),
-        initialRoute:
-            sl<AuthRemoteDataSource>().isAuthenticated ? '/home' : '/splash',
+        // If dark mode is enabled, the theme will be set to darkTheme
+        darkTheme: GemiTheme.darkTheme,
+        theme: GemiTheme.lightTheme,
+        // initialRoute:
+        //     sl<AuthRemoteDataSource>().isAuthenticated ? '/home' : '/splash',
+        initialRoute: '/splash',
         routes: {
           '/home': (context) => const HomeScreen(
                 title: "Gemini",

@@ -54,6 +54,7 @@ class AuthRepositoryImpl implements AuthRepository {
       await _authRemoteDataSource.signOut();
       return Future.value(right(null));
     } catch (e) {
+      log(e.toString());
       return Future.value(
           left(Failure(message: (e as DataSourceException).message)));
     }

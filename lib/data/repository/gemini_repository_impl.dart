@@ -13,6 +13,7 @@ import 'package:gemi/data/data_source/remote/gemini_remote_data_source/gemini_re
 import 'package:gemi/data/data_source/remote/remote_database/remote_database_impl.dart';
 import 'package:gemi/data/model/conversation_model.dart';
 import 'package:gemi/data/model/gemini/candidate/candidate.dart';
+import 'package:gemi/data/model/gemini/gemini_safety/safety_category.dart';
 import 'package:gemi/data/model/gemini/gemini_safety/safety_setting.dart';
 import 'package:gemi/data/model/gemini/generation_config/generation_config.dart';
 import 'package:gemi/data/model/prompt_model.dart';
@@ -38,6 +39,7 @@ class GeminiRepositoryImpl implements GeminiRepository {
   @override
   Stream<Conversation> get conversationStream =>
       _conversationStreamController.stream;
+
   GeminiRepositoryImpl(
     this._localDataSource,
     this._remoteDataSource,

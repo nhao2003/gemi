@@ -1,23 +1,22 @@
 import 'dart:typed_data';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 
 class GemiTextField extends StatefulWidget {
   final Function(String text, List<XFile>? images)? onSend;
   final EdgeInsets? padding;
   final EdgeInsets? margin;
   final Function()? onTap;
-  final FocusNode? focusNode;
   const GemiTextField({
     super.key,
     this.onSend,
     this.padding,
     this.margin,
     this.onTap,
-    this.focusNode,
   });
 
   @override
@@ -28,35 +27,37 @@ class _GemiTextFieldState extends State<GemiTextField> {
   final TextEditingController _textEditingController = TextEditingController();
   final ImagePicker _imagePicker = ImagePicker();
   List<XFile>? _images;
-  FocusNode? _focusNode;
 
   @override
   void dispose() {
     _textEditingController.dispose();
-    _focusNode?.dispose();
     super.dispose();
   }
 
+  String get text => _textEditingController.text.trim();
+
   @override
   Widget build(BuildContext context) {
-    _focusNode = widget.focusNode ?? FocusNode();
     return Container(
       padding: widget.padding,
       margin: widget.margin,
       child: Column(
         children: [
           if (_images != null) _buildImageList(),
-          TextField(
-            autofocus: false,
-            maxLines: 5,
-            minLines: 1,
-            focusNode: _focusNode,
-            onTapOutside: (event) {
-              _focusNode?.unfocus();
-            },
-            controller: _textEditingController,
-            onTap: widget.onTap,
-            decoration: InputDecoration(
+          TextFormField(
+              autofocus: false,
+              maxLines: 5,
+              minLines: 1,
+              onTapOutside: (event) {
+                FocusScope.of(context).unfocus();
+              },
+              controller: _textEditingController,
+              onTap: widget.onTap,
+              keyboardType: TextInputType.multiline,
+              onChanged: (value) {
+                setState(() {});
+              },
+              decoration: InputDecoration(
                 labelText: 'Enter a prompt here',
                 floatingLabelBehavior: FloatingLabelBehavior.never,
                 border: const OutlineInputBorder(
@@ -67,11 +68,14 @@ class _GemiTextFieldState extends State<GemiTextField> {
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
                 filled: true,
                 //e9eef6
-                fillColor: const Color(0xffE9EEF6),
-                suffixIcon: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
+                fillColor: Theme.of(context).colorScheme.surface,
+                suffixIcon: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  padding: const EdgeInsets.only(right: 8.0),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
                         tooltip: 'Upload image(s)',
                         onPressed: () {
                           _imagePicker.pickMultiImage().then((value) {
@@ -80,30 +84,38 @@ class _GemiTextFieldState extends State<GemiTextField> {
                             });
                           });
                         },
-                        icon: const Icon(Icons.add_photo_alternate_outlined)),
-                    IconButton(
-                      tooltip: 'Use microphone',
-                      onPressed: () {},
-                      icon: const Icon(Icons.mic_none_outlined),
-                    ),
-                    IconButton(
-                      tooltip: 'Submit',
-                      onPressed: () {
-                        widget.onSend?.call(
-                          _textEditingController.text,
-                          _images,
-                        );
-                        FocusScope.of(context).unfocus();
-                        _textEditingController.clear();
-                        setState(() {
-                          _images = null;
-                        });
-                      },
-                      icon: const Icon(Icons.send_outlined),
-                    ),
-                  ],
-                )),
-          ),
+                        icon: const Icon(Icons.add_photo_alternate_outlined),
+                      ),
+                      IconButton(
+                        tooltip: 'Use microphone',
+                        onPressed: () {},
+                        icon: const Icon(Icons.mic_none_outlined),
+                      ),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 300),
+                        reverseDuration: const Duration(milliseconds: 300),
+                        child: text.isEmpty
+                            ? null
+                            : IconButton(
+                                tooltip: 'Submit',
+                                onPressed: () {
+                                  widget.onSend?.call(
+                                    text,
+                                    _images,
+                                  );
+                                  FocusScope.of(context).unfocus();
+                                  _textEditingController.clear();
+                                  setState(() {
+                                    _images = null;
+                                  });
+                                },
+                                icon: const Icon(Icons.send_outlined),
+                              ),
+                      ),
+                    ],
+                  ),
+                ),
+              )),
         ],
       ),
     );

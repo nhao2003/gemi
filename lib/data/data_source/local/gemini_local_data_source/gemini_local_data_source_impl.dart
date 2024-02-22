@@ -2,8 +2,6 @@ import 'package:gemi/core/errors/data_source_exception.dart';
 import 'package:gemi/data/data_source/local/gemini_local_data_source/gemini_local_data_source.dart';
 import 'package:gemi/data/model/conversation_model.dart';
 import 'package:gemi/data/model/prompt_model.dart';
-import 'package:gemi/domain/entities/conversation.dart';
-import 'package:gemi/domain/entities/prompt.dart';
 import 'package:sqflite/sqflite.dart';
 
 class GeminiLocalDataSourceImpl implements GeminiLocalDataSource {
@@ -20,14 +18,13 @@ class GeminiLocalDataSourceImpl implements GeminiLocalDataSource {
 
   @override
   Future<List<PromptModel>> getPrompts(String conversationId) async {
-    return _catchError(() async {
+    return await _catchError<List<PromptModel>>(() async {
       final data = await database.query(
         'prompts',
         where: 'conversation_id = ?',
         whereArgs: [conversationId],
         orderBy: 'created_at ASC',
       );
-
       return data.map((e) => PromptModel.fromJson(e)).toList();
     });
   }

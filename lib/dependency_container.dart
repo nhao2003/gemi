@@ -28,6 +28,7 @@ import 'data/repository/data_storage_repository_impl.dart';
 import 'data/repository/setting_repository_impl.dart';
 import 'domain/repositories/data_storage_repository.dart';
 import 'domain/repositories/setting_repository.dart';
+import 'presentation/authentication/sign_up/bloc/sign_up_bloc.dart';
 import 'presentation/setting/bloc/setting_bloc.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -104,5 +105,6 @@ Future<void> init() async {
         sl<GeminiRepository>(),
       ));
   sl.registerLazySingleton<SplashBloc>(() => SplashBloc(sl<AuthRepository>()));
+  sl.registerLazySingleton<SignUpBloc>(() => SignUpBloc(sl<AuthRepository>()));
   sl.registerLazySingleton<SignInBloc>(() => SignInBloc(sl<AuthRepository>()));
 }

@@ -4,14 +4,15 @@ import 'dart:math';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_highlighter/flutter_highlighter.dart';
 import 'package:flutter_highlighter/themes/atom-one-dark.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class CodeElementBuilder extends MarkdownElementBuilder {
-  bool isDark = false;
-  CodeElementBuilder({this.isDark = false});
+  BuildContext context;
+  CodeElementBuilder({required this.context});
 
   @override
   Widget? visitElementAfter(dynamic element, TextStyle? preferredStyle) {
@@ -24,11 +25,15 @@ class CodeElementBuilder extends MarkdownElementBuilder {
       codeLanguage = language[0].toUpperCase() + language.substring(1);
     }
     Map<String, TextStyle> theme = Map.from(atomOneDarkTheme);
-    if (!isDark) {
-      theme['root'] =
-          theme['root']!.copyWith(backgroundColor: Colors.grey[200]);
-    }
+
+    theme['root'] = theme['root']!
+        .copyWith(backgroundColor: Theme.of(context).colorScheme.surface);
+
     return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        color: Theme.of(context).colorScheme.surface,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -39,21 +44,10 @@ class CodeElementBuilder extends MarkdownElementBuilder {
           SizedBox(
             width: double.infinity,
             child: HighlightView(
-              // The original code to be highlighted
               element.textContent,
-
-              // Specify language
-              // It is recommended to give it a value for performance
               language: language,
-
-              // Specify highlight theme
-              // All available themes are listed in `themes` folder
               theme: theme,
-
-              // Specify padding
               padding: const EdgeInsets.all(8),
-
-              // Specify text style
               textStyle: GoogleFonts.robotoMono(),
             ),
           ),
@@ -90,7 +84,7 @@ class CodeElementBuilder extends MarkdownElementBuilder {
               ),
               IconButton(
                 onPressed: () {},
-                icon: Icon(Icons.copy),
+                icon: const Icon(Icons.copy),
               ),
             ],
           ),
@@ -109,7 +103,9 @@ class MarkDownViewer extends StatelessWidget {
     return MarkdownBody(
       data: data,
       builders: {
-        'code': CodeElementBuilder(),
+        'code': CodeElementBuilder(
+          context: context,
+        ),
       },
     );
   }

@@ -1,26 +1,37 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gemi/core/resource/assets.dart';
 
 import 'gradient_text.dart';
 import 'promt_suggestion_chip.dart';
 
+class PromptSuggestChip {
+  final String label;
+  final IconData icon;
+  const PromptSuggestChip({required this.label, required this.icon});
+}
+
 class PromptSuggestion extends StatelessWidget {
-  final List<PromptSuggestChip> promptSuggestChips = [
+  final List<dynamic> promptSuggestChips = const [
     PromptSuggestChip(
-      label: "I'm feeling anxious",
-      icon: Icons.sentiment_very_dissatisfied_rounded,
+      label: "Create vibrant & playful image with lots of details",
+      icon: Icons.draw_outlined,
     ),
     PromptSuggestChip(
-      label: "I'm feeling sad",
-      icon: Icons.sentiment_dissatisfied_rounded,
+      label: "Brainstorm team bonding activities for our work retreat",
+      icon: Icons.lightbulb_outline_rounded,
     ),
     PromptSuggestChip(
-      label: "I'm feeling angry",
-      icon: Icons.sentiment_neutral_rounded,
+      label: "Create a travel itinerary for a city",
+      icon: Icons.code,
     ),
     PromptSuggestChip(
-      label: "I'm feeling happy",
-      icon: Icons.sentiment_satisfied_rounded,
+      label: "Help me craft an OOO message based on a few details",
+      icon: Icons.draw_outlined,
+    ),
+    PromptSuggestChip(
+      label: "What's the time it takes to walk to several landmarks",
+      icon: Icons.map_rounded,
     ),
   ];
   EdgeInsetsGeometry? listPromptPadding;
@@ -37,34 +48,32 @@ class PromptSuggestion extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Image.asset(
-                Assets.sparkleResting,
-                scale: 1.75,
-              ),
+              SizedBox(height: 20),
               GradientText(
                 "Hello Hào.",
                 gradient: const LinearGradient(
                   colors: <Color>[
                     //f49c48
-                    Color(0xffF49C48),
-                    //#cf8d7c
-                    Color(0xffCF8D7C),
+                    Color(
+                        0xFF4285F4), // --bard-color-brand-text-gradient-stop-1
+                    Color(
+                        0xFF9B72CB), // --bard-color-brand-text-gradient-stop-2
+                    Color(0xFFD96570),
                   ],
                 ),
-                style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
+                style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
                     ),
               ),
               Text("How can I help you today?",
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onBackground
-                            .withOpacity(0.5),
+                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFC4C7C5),
                       )),
             ],
           ),
         ),
+        SizedBox(height: 40),
         SingleChildScrollView(
           padding: EdgeInsets.symmetric(
             horizontal: listPromptPadding?.horizontal ?? 0,
@@ -77,42 +86,11 @@ class PromptSuggestion extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.max,
                 children: [
-                  SuggestionPromptCard(
-                    key: UniqueKey(),
-                    promptSuggestChips: promptSuggestChips,
-                    gradient: const LinearGradient(
-                      colors: <Color>[
-                        //f49c48
-                        Color(0xffcf8d7c),
-                        //#cf8d7c
-                        Color(0xffa77cb4),
-                      ],
+                  for (var chip in promptSuggestChips)
+                    PromptContainer(
+                      title: chip.label,
+                      icon: chip.icon,
                     ),
-                  ),
-                  SuggestionPromptCard(
-                    key: UniqueKey(),
-                    promptSuggestChips: promptSuggestChips,
-                    gradient: const LinearGradient(
-                      colors: <Color>[
-                        //f49c48
-                        Color(0xffa77cb4),
-                        //#cf8d7c
-                        Color(0xff7f7dd1),
-                      ],
-                    ),
-                  ),
-                  SuggestionPromptCard(
-                    key: UniqueKey(),
-                    promptSuggestChips: promptSuggestChips,
-                    gradient: const LinearGradient(
-                      colors: <Color>[
-                        //f49c48
-                        Color(0xff7f7dd1),
-                        //#cf8d7c
-                        Color(0xff548dd9),
-                      ],
-                    ),
-                  ),
                 ],
               ),
             ],

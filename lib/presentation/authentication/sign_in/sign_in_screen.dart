@@ -148,9 +148,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                       return const CircularProgressIndicator();
                                     }
                                     return ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blue,
-                                      ),
+                                      style: ElevatedButton.styleFrom(),
                                       onPressed: () {
                                         if (_formKey.currentState!.validate()) {
                                           context.read<SignInBloc>().add(
@@ -165,7 +163,6 @@ class _SignInScreenState extends State<SignInScreen> {
                                       child: const Text(
                                         "Sign In",
                                         style: TextStyle(
-                                          color: Colors.white,
                                           fontSize: 16,
                                         ),
                                       ),
@@ -233,9 +230,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           RichText(
                             text: const TextSpan(
                               text: "By signing in, you agree to our ",
-                              style: TextStyle(
-                                color: Colors.black,
-                              ),
+                              style: TextStyle(),
                               children: [
                                 TextSpan(
                                   text: "Terms of Service",

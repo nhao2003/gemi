@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gemi/dependency_container.dart';
 import 'package:gemi/domain/entities/conversation.dart';
 import 'package:gemi/domain/entities/prompt.dart';
-import 'package:gemi/presentation/home/widgets/chat_input.dart';
+import 'package:gemi/presentation/home/widgets/gemini_text_input.dart';
 import 'package:gemi/presentation/home/widgets/gemini_drawer.dart';
 import 'package:gemi/presentation/home/widgets/home_started.dart';
 import 'package:gemi/core/resource/assets.dart';
