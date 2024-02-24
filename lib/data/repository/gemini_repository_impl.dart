@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:gemi/core/errors/data_source_exception.dart';
 import 'package:gemi/core/optional.dart';
 import 'package:gemi/core/utils/mutex.dart';
+import 'package:gemi/core/utils/string_util.dart';
 import 'package:gemi/data/data_source/remote/gemini_remote_data_source/gemini_remote_data_source.dart';
 import 'package:gemi/data/data_source/remote/remote_database/remote_database_impl.dart';
 import 'package:gemi/data/model/conversation_model.dart';
@@ -66,8 +67,10 @@ class GeminiRepositoryImpl implements GeminiRepository {
     }
   }
 
-  Future<Conversation> _createConversation({required String name}) async {
+  Future<Conversation> _createConversation(
+      {required String id, required String name}) async {
     final conversation = ConversationModel(
+      id: id,
       userId: _remoteDatabase.userId,
       name: name,
     );
@@ -85,8 +88,10 @@ class GeminiRepositoryImpl implements GeminiRepository {
     final lock = await _mutex.acquire();
     try {
       if (conversationId == null) {
-        final conversation =
-            await _createConversation(name: text ?? "Untitled Conversation");
+        final conversation = await _createConversation(
+          id: StringUtil.uuid,
+          name: text ?? "Untitled Conversation",
+        );
         conversationId = conversation.id;
       }
       Candidate? candidate;
@@ -142,7 +147,9 @@ class GeminiRepositoryImpl implements GeminiRepository {
   Future<Either<Failure, List<Conversation>>> getConversations() async {
     try {
       final List<ConversationModel> conversations =
-          await _localDataSource.getConversations();
+          await _localDataSource.getConversations(
+        _remoteDatabase.userId,
+      );
       if (conversations.isEmpty) {
         final remoteConversations = await _remoteDatabase.getConversations();
         await _localDataSource.insertConversations(remoteConversations);
@@ -156,18 +163,20 @@ class GeminiRepositoryImpl implements GeminiRepository {
   }
 
   @override
-  Stream<Either<Failure, Prompt?>> streamGeneratedPrompt(
-      {String? text, List<String>? images, String? conversationId}) async* {
+  Stream<Either<Failure, Prompt?>> streamGeneratedPrompt({
+    String? text,
+    List<String>? images,
+    required String conversationId,
+    bool newConversation = false,
+  }) async* {
     final lock = await _mutex.acquire();
-    if (conversationId == null) {
-      final conversation =
-          await _createConversation(name: text ?? "Untitled Conversation");
+    if (newConversation) {
+      final conversation = await _createConversation(
+        id: conversationId,
+        name: text ?? "Untitled Conversation",
+      );
       conversationId = conversation.id;
     }
-    final List<Uint8List>? imageBytes = images != null
-        ? await Future.wait(images.map((e) => File(e).readAsBytes()))
-        : null;
-
     final userPrompt = PromptModel.create(
       userId: _remoteDatabase.userId,
       conversationId: conversationId,
@@ -175,36 +184,26 @@ class GeminiRepositoryImpl implements GeminiRepository {
       role: Role.user,
       images: images,
     );
-
     yield Right(userPrompt);
-    _catchError(() async {
+
+    final List<Uint8List>? imageBytes = images != null
+        ? await Future.wait(images.map((e) => File(e).readAsBytes()))
+        : null;
+
+    var updatedPrompt = userPrompt;
+    if (images != null) {
       final res = await _dataStorageRepository.uploadFiles(
-          files: images!.map((e) => File(e)).toList(),
+          files: images.map((e) => File(e)).toList(),
           path: 'conversations/$conversationId',
           bucketName: 'images');
       res.fold((l) => null, (r) async {
-        final updatedPrompt = userPrompt.copyWith(images: Optional(r));
-        await Future.wait([
-          _localDataSource.insertPrompt(updatedPrompt),
-          _remoteDatabase.insertPrompt(updatedPrompt),
-        ]);
+        updatedPrompt = userPrompt.copyWith(images: Optional(r));
       });
-    });
-    if (images != null) {
-      _dataStorageRepository
-          .uploadFiles(
-              files: images.map((e) => File(e)).toList(),
-              path: 'conversations/$conversationId',
-              bucketName: 'images')
-          .then((value) {
-        value.fold((l) => null, (r) {
-          _localDataSource.updatePrompt(userPrompt.id, {
-            "images": jsonEncode(r),
-          });
-        });
-      }).catchError((e) => print(e));
     }
-
+    await Future.wait([
+      _localDataSource.insertPrompt(updatedPrompt),
+      _remoteDatabase.insertPrompt(updatedPrompt),
+    ]);
     String cache = "";
     var prompt = PromptModel.create(
       userId: _remoteDatabase.userId,
@@ -281,8 +280,11 @@ class GeminiRepositoryImpl implements GeminiRepository {
     final lock = await _mutex.acquire();
     final prompts = [...chats];
     if (conversationId == null) {
-      final conversation = await _createConversation(name: text);
-      conversationId = conversation.id;
+      final conv = await _createConversation(
+        id: StringUtil.uuid,
+        name: text ?? "Untitled Conversation",
+      );
+      conversationId = conv.id;
     }
 
     final prompt = PromptModel.create(

@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
+import 'package:gemi/presentation/home/widgets/image_row.dart';
 import 'package:image_picker/image_picker.dart';
 
 class GemiTextField extends StatefulWidget {
@@ -43,7 +45,15 @@ class _GemiTextFieldState extends State<GemiTextField> {
       margin: widget.margin,
       child: Column(
         children: [
-          if (_images != null) _buildImageList(),
+          if (_images != null)
+            ImageRow(
+              images: _images?.map((e) => e.path).toList() ?? [],
+              onRemove: (image) {
+                setState(() {
+                  _images?.removeWhere((element) => element.path == image);
+                });
+              },
+            ),
           TextFormField(
               autofocus: false,
               maxLines: 5,
@@ -55,7 +65,9 @@ class _GemiTextFieldState extends State<GemiTextField> {
               onTap: widget.onTap,
               keyboardType: TextInputType.multiline,
               onChanged: (value) {
-                setState(() {});
+                if (text.isEmpty || text.length == 1) {
+                  setState(() {});
+                }
               },
               decoration: InputDecoration(
                 labelText: 'Enter a prompt here',
@@ -117,71 +129,6 @@ class _GemiTextFieldState extends State<GemiTextField> {
                 ),
               )),
         ],
-      ),
-    );
-  }
-
-  Widget _buildImageList() {
-    return SizedBox(
-      height: 100,
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _images!.length,
-        itemBuilder: (context, index) {
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Stack(
-                fit: StackFit.passthrough,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      // Code for viewing image
-                    },
-                    child: FutureBuilder<Uint8List?>(
-                      future: _images != null
-                          ? _images![index].readAsBytes()
-                          : null,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const CircularProgressIndicator();
-                        }
-                        if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
-                        }
-                        if (snapshot.hasData) {
-                          return Image.memory(
-                            snapshot.data!,
-                            width: 100,
-                            height: 100,
-                            fit: BoxFit.cover,
-                          );
-                        }
-                        return Container();
-                      },
-                    ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    right: 0,
-                    child: IconButton(
-                      tooltip: 'Remove image',
-                      splashRadius: 20,
-                      onPressed: () {
-                        setState(() {
-                          _images!.removeAt(index);
-                        });
-                      },
-                      icon: const Icon(Icons.close_rounded),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
       ),
     );
   }

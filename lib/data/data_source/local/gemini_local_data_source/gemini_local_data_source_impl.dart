@@ -55,10 +55,11 @@ class GeminiLocalDataSourceImpl implements GeminiLocalDataSource {
   }
 
   @override
-  Future<List<ConversationModel>> getConversations() async {
+  Future<List<ConversationModel>> getConversations(String userId) async {
     return _catchError(() async {
       final data = await database.query(
         'conversations',
+        where: 'user_id = ?',
         orderBy: 'last_message_date DESC',
       );
 

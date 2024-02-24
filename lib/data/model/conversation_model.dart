@@ -8,7 +8,7 @@ part 'conversation_model.g.dart';
 @JsonSerializable()
 class ConversationModel extends Conversation {
   ConversationModel({
-    super.id,
+    required super.id,
     required super.userId,
     required super.name,
     super.lastMessageDate,
@@ -28,10 +28,12 @@ class ConversationModel extends Conversation {
   Map<String, dynamic> toJson() => _$ConversationModelToJson(this);
 
   factory ConversationModel.create({
+    required String id,
     required String userId,
     required String name,
   }) {
     return ConversationModel(
+      id: id,
       userId: userId,
       name: name,
     );

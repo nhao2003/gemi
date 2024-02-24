@@ -18,7 +18,8 @@ abstract class GeminiRepository {
   Stream<Either<Failure, Prompt?>> streamGeneratedPrompt({
     String? text,
     List<String>? images,
-    String? conversationId,
+    required String conversationId,
+    bool newConversation = false,
   });
 
   Stream<Either<Failure, Prompt?>> streamGenerateChat(

@@ -18,13 +18,12 @@ class Conversation extends Equatable {
   final DateTime? createdAt;
 
   Conversation({
-    String? id,
+    required this.id,
     required this.name,
     this.userId,
     this.lastMessageDate,
     DateTime? createdAt,
-  })  : id = id ?? const Uuid().v4(),
-        createdAt = createdAt ?? DateTime.now();
+  }) : createdAt = createdAt ?? DateTime.now();
 
   @override
   List<Object?> get props => [

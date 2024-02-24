@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:gemi/core/utils/string_util.dart';
 import 'package:gemi/domain/repositories/gemini_repository.dart';
 
 import '../../../domain/entities/conversation.dart';
@@ -24,7 +25,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       _conversationStream.add(_conversations);
     });
     on<HomeEvent>((event, emit) {
-      // TODO: implement event handler
       print(state.runtimeType.toString());
     });
     on<HomeConversationSelected>((event, emit) async {
@@ -56,7 +56,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
     on<HomePromptSubmitted>((event, emit) async {
       final prompts = [...?state.prompts];
-      String? conversationId = state.currentConversationId;
+      bool newConversation = state.currentConversationId == null;
+      String conversationId = state.currentConversationId ?? StringUtil.uuid;
       final newState = HomeOnChat(
         prompts: prompts,
         currentConversationId: conversationId,
@@ -67,6 +68,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         text: event.text,
         conversationId: conversationId,
         images: event.images,
+        newConversation: newConversation,
       );
       await for (var value in result) {
         value.fold((l) {
@@ -92,7 +94,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         });
         event.onPromptSubmitted?.call();
       }
-      emit(state.copyWith(isGenerating: false));
+      emit(newState.copyWith(isGenerating: false));
     });
 
     on<HomeConversationDeleted>((event, emit) async {

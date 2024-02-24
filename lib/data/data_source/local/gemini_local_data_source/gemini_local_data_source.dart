@@ -14,7 +14,7 @@ abstract class GeminiLocalDataSource {
   Future<int> updatePrompt(String id, Map<String, dynamic> data);
   Future<void> insertConversation(ConversationModel conversation);
   Future<void> insertConversations(List<ConversationModel> conversations);
-  Future<List<ConversationModel>> getConversations();
+  Future<List<ConversationModel>> getConversations(String userId);
   Future<Map<String, dynamic>> getConversation(String conversationId);
   Future<void> deleteConversation(String conversationId);
   Future<void> updateConversation(ConversationModel conversation);
