@@ -25,11 +25,13 @@ void main() {
 
     test('toJson() should return a valid JSON map', () {
       final conversation = ConversationModel.create(
+        id: '123',
         userId: 'user123',
         name: 'Test Conversation',
       );
       final result = conversation.toJson();
       expect(result, isA<Map<String, dynamic>>());
+      expect(result['id'], '123');
       expect(result['user_id'], 'user123');
       expect(result['name'], 'Test Conversation');
     });

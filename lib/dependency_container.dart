@@ -63,7 +63,7 @@ Future<void> init() async {
           ));
   sl.registerLazySingleton<GeminiRemoteDataSource>(
       () => GeminiRemoteDataSourceImpl(
-            api: GeminiService(
+            service: GeminiService(
               Dio(BaseOptions(
                 baseUrl:
                     '${GeminiConstants.baseUrl}${GeminiConstants.defaultVersion}/',
